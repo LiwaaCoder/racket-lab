@@ -1,70 +1,92 @@
 # racquet-lab
 
-**racquet-lab** is a Python library that bridges the gap between Tennis Equipment Physics and Software Engineering. It provides tools to calculate advanced racket properties like Recoil Weight and MGR/I (Maneuverability Index), and simulates racket customization with scientific accuracy.
+[![PyPI version](https://badge.fury.io/py/racquet-lab.svg)](https://badge.fury.io/py/racquet-lab)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 
-## Features
+**racquet-lab** is a Python library that bridges the gap between Tennis Equipment Physics and Software Engineering. It provides tools to calculate advanced racket properties like Recoil Weight and MGR/I (Maneuverability Index), simulates racket customization with scientific accuracy, and includes a recommendation engine for string tensions and racket matching.
 
-- **Recoil Weight Calculation**: Determine a racket's resistance to "recoil" (angular acceleration) upon ball impact.
-- **MGR/I (Maneuverability Index)**: Calculate the efficiency of a racket's swing dynamics based on pendulum physics.
-- **Scientific Customization**: Simulate adding lead tape (mass) at specific positions and instantly get updated specifications (Balance, Swingweight, Recoil Weight) using the Parallel Axis Theorem.
-- **Immutability**: The `Racket` class is immutable, ensuring safe calculations without side effects.
-- **Recommendation Engine**:
-    - **Tension Calculator**: Suggests optimal tension based on string material, head size, and player profile.
-    - **Similarity Search**: Finds matching rackets using weighted Euclidean distance.
+## 🚀 Features
 
-## Installation
+*   **Physics Engine**: Calculate **Recoil Weight** and **MGR/I** (Maneuverability Index) with high precision.
+*   **Customization Lab**: Simulate adding weight (lead tape) at any position and instantly see the effects on **Balance**, **Swingweight**, and **Recoil Weight** using the Parallel Axis Theorem. Includes Immutability for safe chainable operations.
+*   **Recommendation Advisor**:
+    *   **Tension Calculator**: Get scientifically backed tension suggestions based on string material (Poly, Gut, etc.), head size, and player injury history.
+    *   **Similarity Search**: Find rackets in a database that maximize "feel" similarity to a target frame using weighted Euclidean distance.
+
+## 📦 Installation
+
+Install the package via pip:
 
 ```bash
 pip install racquet-lab
 ```
-*(Or clone the repository and run `pip install .`)*
 
-## Usage
+## 🛠 Usage
 
-### 1. Basic Specifications
+### 1. Physics & Customization
+
 ```python
 from racquet_lab.racket import Racket
 
-# Initialize a standard player's racket
-# Mass: 305g, Balance: 32cm, Swingweight: 290 kg·cm²
-racket = Racket("Pure Aero", mass_g=305, balance_cm=32.0, swingweight=290)
+# 1. Initialize a racket (Mass in g, Balance in cm, Swingweight in kg·cm²)
+pure_aero = Racket(name="Pure Aero", mass_g=300, balance_cm=32.0, swingweight=290)
 
-print(f"Recoil Weight: {racket.recoil_weight():.2f}")
-print(f"MGR/I: {racket.mgr_i():.2f}")
+print(f"Recoil Weight: {pure_aero.recoil_weight():.1f}")  # Output: 144.8
+
+# 2. Customize: Add 4g of lead tape at 12 o'clock (70cm from handle)
+custom_spec = pure_aero.customize(mass_added_g=4, position_cm=70)
+
+print(f"New Swingweight: {custom_spec.swingweight:.1f}")  # Output: 304.4
+print(f"New Balance: {custom_spec.balance_cm:.2f} cm")    # Output: 32.49 cm
+# Original instance remains unchanged (Immutable)
 ```
 
-### 2. Customization (Adding Weight)
-Simulate adding 4 grams of lead tape at the 12 o'clock position (approx. 70cm from handle).
+### 2. String Tension Advisor
 
-```python
-# Add 4g at 70cm
-customized_racket = racket.customize(mass_added_g=4, position_cm=70)
-
-print(f"Original SW: {racket.swingweight}")
-print(f"New SW: {customized_racket.swingweight}")
-print(f"New Balance: {customized_racket.balance_cm:.2f} cm")
-```
-
-### 3. Advisor
 ```python
 from racquet_lab.advisor import StringsAdvisor, StringMaterial, PlayerProfile
 
-player = PlayerProfile(has_injury_history=True)
-tension = StringsAdvisor.suggest_tension(StringMaterial.POLYESTER, 100, player)
-print(f"Suggested Tension: {tension} lbs")
+# Configure player profile
+profile = PlayerProfile(has_injury_history=True, level="intermediate")
+
+# Get recommendation for a Polyester string on a 100 sq in head
+tension = StringsAdvisor.suggest_tension(
+    material=StringMaterial.POLYESTER, 
+    head_size_sq_in=100, 
+    profile=profile
+)
+
+print(f"Recommended Tension: {tension} lbs") # Returns lower tension for arm safety
 ```
 
-## Physics Background
+### 3. Finding Similar Rackets
 
-### Recoil Weight
-Formula: $SW - Mass_{kg} \times (Balance_{cm} - 10)^2$
+```python
+from racquet_lab.advisor import RacketMatcher
 
-### MGR/I
-A ratio derived from double pendulum physics that describes how easily a racket can be maneuvered to generate racket head speed. Typical values range from 20.0 to 21.5.
-
-## Development
-
-Run tests:
-```bash
-python -m unittest discover tests
+# Find the closest match to 'pure_aero' in a list of candidate rackets
+match = RacketMatcher.find_closest_match(pure_aero, candidate_rackets_list)
+print(f"Most similar racket: {match.name}")
 ```
+
+## 📚 Physics Background
+
+*   **Recoil Weight**: $SW - Mass_{kg} \times (Balance_{cm} - 10)^2$
+    *   Describes the racket's resistance to angular acceleration (kicking back) upon contact. Higher RW = more stability.
+*   **MGR/I**: derived from double pendulum physics.
+    *   describes how easily a racket can be maneuvered to generate racket head speed. Typical values range from 20.0 to 21.5.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the repository
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
