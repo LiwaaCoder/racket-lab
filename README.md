@@ -8,6 +8,9 @@
 - **MGR/I (Maneuverability Index)**: Calculate the efficiency of a racket's swing dynamics based on pendulum physics.
 - **Scientific Customization**: Simulate adding lead tape (mass) at specific positions and instantly get updated specifications (Balance, Swingweight, Recoil Weight) using the Parallel Axis Theorem.
 - **Immutability**: The `Racket` class is immutable, ensuring safe calculations without side effects.
+- **Recommendation Engine**:
+    - **Tension Calculator**: Suggests optimal tension based on string material, head size, and player profile.
+    - **Similarity Search**: Finds matching rackets using weighted Euclidean distance.
 
 ## Installation
 
@@ -24,7 +27,7 @@ from racquet_lab.racket import Racket
 
 # Initialize a standard player's racket
 # Mass: 305g, Balance: 32cm, Swingweight: 290 kg·cm²
-racket = Racket(mass_g=305, balance_cm=32.0, swingweight_kg_cm2=290)
+racket = Racket("Pure Aero", mass_g=305, balance_cm=32.0, swingweight=290)
 
 print(f"Recoil Weight: {racket.recoil_weight():.2f}")
 print(f"MGR/I: {racket.mgr_i():.2f}")
@@ -37,9 +40,18 @@ Simulate adding 4 grams of lead tape at the 12 o'clock position (approx. 70cm fr
 # Add 4g at 70cm
 customized_racket = racket.customize(mass_added_g=4, position_cm=70)
 
-print(f"Original SW: {racket.swingweight_kg_cm2}")
-print(f"New SW: {customized_racket.swingweight_kg_cm2}")
+print(f"Original SW: {racket.swingweight}")
+print(f"New SW: {customized_racket.swingweight}")
 print(f"New Balance: {customized_racket.balance_cm:.2f} cm")
+```
+
+### 3. Advisor
+```python
+from racquet_lab.advisor import StringsAdvisor, StringMaterial, PlayerProfile
+
+player = PlayerProfile(has_injury_history=True)
+tension = StringsAdvisor.suggest_tension(StringMaterial.POLYESTER, 100, player)
+print(f"Suggested Tension: {tension} lbs")
 ```
 
 ## Physics Background
